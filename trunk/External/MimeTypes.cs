@@ -24,6 +24,7 @@ namespace MediaLib.Web
 		public static readonly MimeType CssStyleSheet;
 		public static readonly MimeType Html;
 		public static readonly MimeType Xml;
+		public static readonly MimeType Rss;
 
 		internal const string JavaScriptContentType = "application/javascript";
 		internal const string CssStyleSheetContentType = "text/css";
@@ -184,6 +185,19 @@ namespace MediaLib.Web
 					MimeTypes.Xml.Primary = true;
 					MimeTypes.MimeByExtension[MimeTypes.Xml.FileExts[0]] = MimeTypes.Xml;
 					MimeTypes.MimeByContentType[MimeTypes.Xml.ContentTypes[0]] = MimeTypes.Xml;
+				}
+
+				MimeTypes.Rss = MimeTypes.GetByExtension(".rss");
+				if (MimeTypes.Rss == null)
+				{
+					MimeTypes.Rss = new MimeType();
+					MimeTypes.Rss.Name = "RSS";
+					MimeTypes.Rss.FileExts = new String[] { ".rss" };
+					MimeTypes.Rss.ContentTypes = new String[] { "application/rss+xml" };
+					MimeTypes.Rss.Category = MimeCategory.Xml;
+					MimeTypes.Rss.Primary = true;
+					MimeTypes.MimeByExtension[MimeTypes.Rss.FileExts[0]] = MimeTypes.Rss;
+					MimeTypes.MimeByContentType[MimeTypes.Rss.ContentTypes[0]] = MimeTypes.Rss;
 				}
 
 				MimeTypes.Html = MimeTypes.GetByExtension(".htm");
