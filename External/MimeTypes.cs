@@ -4,12 +4,14 @@ using System.IO;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
+using MediaLib.Web.Hosting;
+
 namespace MediaLib.Web
 {
 	/// <summary>
 	/// http://www.iana.org/assignments/media-types/
 	/// </summary>
-	public sealed class MimeTypes
+	public static class MimeTypes
 	{
 		#region Constants
 
@@ -37,11 +39,11 @@ namespace MediaLib.Web
 		{
 			string mimeMapXml = System.Configuration.ConfigurationManager.AppSettings[MimeTypes.AppSettingsKey_MimeMapXml];
 			if (!String.IsNullOrEmpty(mimeMapXml) && System.Web.HttpContext.Current != null)
-				mimeMapXml = MediaLib.Web.Handlers.FilePathMapper.GetPhysicalPath(mimeMapXml);
+				mimeMapXml = FilePathMapper.GetPhysicalPath(mimeMapXml);
 
 			try
 			{
-				if (File.Exists(mimeMapXml))
+				if (FilePathMapper.FileExists(mimeMapXml))
 				{
 					using (FileStream stream = File.OpenRead(mimeMapXml))
 					{
@@ -106,6 +108,8 @@ namespace MediaLib.Web
 			catch
 			{
 				MimeTypes.ConfigTypes = new MimeType[0];
+				MimeTypes.MimeByExtension = new Dictionary<string, MimeType>(MimeTypes.ConfigTypes.Length);
+				MimeTypes.MimeByContentType = new Dictionary<string, MimeType>(MimeTypes.ConfigTypes.Length);
 			}
 			finally
 			{
@@ -213,10 +217,6 @@ namespace MediaLib.Web
 					MimeTypes.MimeByContentType[MimeTypes.Html.ContentTypes[0]] = MimeTypes.Html;
 				}
 			}
-		}
-
-		private MimeTypes()
-		{
 		}
 
 		#endregion Init
