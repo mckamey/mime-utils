@@ -37,7 +37,7 @@ namespace MediaLib.Web
 		{
 			string mimeMapXml = System.Configuration.ConfigurationManager.AppSettings[MimeTypes.AppSettingsKey_MimeMapXml];
 			if (!String.IsNullOrEmpty(mimeMapXml) && System.Web.HttpContext.Current != null)
-				mimeMapXml = System.Web.HttpContext.Current.Server.MapPath(mimeMapXml);
+				mimeMapXml = MediaLib.Web.Handlers.FilePathMapper.GetPhysicalPath(mimeMapXml);
 
 			try
 			{
