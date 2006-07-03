@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Collections.Generic;
 using System.Xml.Serialization;
+using System.Web.Hosting;
 
 using MediaLib.Web.Hosting;
 
@@ -39,7 +40,7 @@ namespace MediaLib.Web
 		{
 			string mimeMapXml = System.Configuration.ConfigurationManager.AppSettings[MimeTypes.AppSettingsKey_MimeMapXml];
 			if (!String.IsNullOrEmpty(mimeMapXml) && System.Web.HttpContext.Current != null)
-				mimeMapXml = FilePathMapper.GetPhysicalPath(mimeMapXml);
+				mimeMapXml = HostingEnvironment.MapPath(mimeMapXml);
 
 			try
 			{
@@ -270,6 +271,9 @@ namespace MediaLib.Web
 
 		public static MimeCategory GetCategory(string extension)
 		{
+			if (String.IsNullOrEmpty(extension))
+				return MimeCategory.Directory;
+
 			MimeType mime = MimeTypes.GetByExtension(extension);
 			if (mime == null)
 				return MimeCategory.Unknown;
@@ -429,6 +433,7 @@ namespace MediaLib.Web
 	public enum MimeCategory
 	{
 		Unknown,
+		Directory,
 		Document,
 		Image,
 		Audio,
