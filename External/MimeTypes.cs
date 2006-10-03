@@ -222,7 +222,7 @@ namespace MediaLib.Web
 
 		#endregion Init
 
-		#region Properties
+		#region Extension Methods
 
 		public static MimeType GetByExtension(string extension)
 		{
@@ -247,10 +247,6 @@ namespace MediaLib.Web
 
 			return MimeTypes.MimeByContentType[contentType];
 		}
-
-		#endregion Properties
-
-		#region Extension Methods
 
 		/// <summary>
 		/// </summary>
@@ -279,6 +275,61 @@ namespace MediaLib.Web
 				return MimeCategory.Unknown;
 
 			return mime.Category;
+		}
+
+		public static System.Drawing.Imaging.ImageFormat GetImageFormat(string extension)
+		{
+			if (String.IsNullOrEmpty(extension))
+				return null;
+
+			// use MimeTypes collection to standardize the extension
+			MimeType mime = MimeTypes.GetByExtension(extension);
+			if (mime != null)
+				extension = mime.FileExt.ToLowerInvariant();
+			else
+				extension = extension.ToLowerInvariant();
+
+			switch (extension.TrimStart('.'))
+			{
+				case "bmp":
+				{
+					return System.Drawing.Imaging.ImageFormat.Bmp;
+				}
+				case "emf":
+				{
+					return System.Drawing.Imaging.ImageFormat.Emf;
+				}
+				case "exif":
+				{
+					return System.Drawing.Imaging.ImageFormat.Exif;
+				}
+				case "gif":
+				{
+					return System.Drawing.Imaging.ImageFormat.Gif;
+				}
+				case "jpg":
+				case "jpeg":
+				{
+					return System.Drawing.Imaging.ImageFormat.Jpeg;
+				}
+				case "png":
+				{
+					return System.Drawing.Imaging.ImageFormat.Png;
+				}
+				case "tif":
+				case "tiff":
+				{
+					return System.Drawing.Imaging.ImageFormat.Tiff;
+				}
+				case "wmf":
+				{
+					return System.Drawing.Imaging.ImageFormat.Wmf;
+				}
+				default:
+				{
+					return null;
+				}
+			}
 		}
 
 		#endregion Extension Methods
