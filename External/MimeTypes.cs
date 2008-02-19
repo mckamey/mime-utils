@@ -39,8 +39,10 @@ namespace MediaLib.Web
 		static MimeTypes()
 		{
 			string mimeMapXml = System.Configuration.ConfigurationManager.AppSettings[MimeTypes.AppSettingsKey_MimeMapXml];
-			if (!String.IsNullOrEmpty(mimeMapXml) && System.Web.HttpContext.Current != null)
+			if (!String.IsNullOrEmpty(mimeMapXml))
+			{
 				mimeMapXml = HostingEnvironment.MapPath(mimeMapXml);
+			}
 
 			try
 			{
