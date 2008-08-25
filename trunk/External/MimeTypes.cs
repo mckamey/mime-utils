@@ -270,7 +270,7 @@ namespace MediaLib.Web
 		public static MimeCategory GetCategory(string extension)
 		{
 			if (String.IsNullOrEmpty(extension))
-				return MimeCategory.Directory;
+				return MimeCategory.Folder;
 
 			MimeType mime = MimeTypes.GetByExtension(extension);
 			if (mime == null)
@@ -354,29 +354,35 @@ namespace MediaLib.Web
 
 		#endregion Fields
 
-		#region Init
-
-		public MimeType()
-		{
-		}
-
-		#endregion Init
-
 		#region Properties
 
-		[DefaultValue(null)]
+		[DefaultValue("")]
 		[XmlElement("Name")]
 		public string Name
 		{
-			get { return this.name; }
+			get
+			{
+				if (this.name == null)
+				{
+					return String.Empty;
+				}
+				return this.name;
+			}
 			set { this.name = value; }
 		}
 
-		[DefaultValue(null)]
+		[DefaultValue("")]
 		[XmlElement("Description")]
 		public string Description
 		{
-			get { return this.description; }
+			get
+			{
+				if (this.description == null)
+				{
+					return String.Empty;
+				}
+				return this.description;
+			}
 			set { this.description = value; }
 		}
 
@@ -388,12 +394,16 @@ namespace MediaLib.Web
 			set
 			{
 				if (value == null)
+				{
 					value = new string[0];
+				}
 
 				foreach (string fileExt in value)
 				{
 					if (fileExt == null || fileExt.IndexOf('.') < 0)
+					{
 						throw new FormatException("FileExt is not correct format: "+fileExt);
+					}
 				}
 
 				this.fileExts = value;
@@ -408,12 +418,16 @@ namespace MediaLib.Web
 			set
 			{
 				if (value == null)
+				{
 					value = new string[0];
+				}
 
 				foreach (string contentType in value)
 				{
 					if (contentType == null || contentType.IndexOf('/') < 0)
+					{
 						throw new FormatException("ContentType is not correct format: "+contentType);
+					}
 				}
 
 				this.contentTypes = value;
@@ -446,7 +460,9 @@ namespace MediaLib.Web
 			get
 			{
 				if (this.ContentTypes == null || this.ContentTypes.Length < 1)
+				{
 					return String.Empty;
+				}
 				return this.ContentTypes[0];
 			}
 		}
@@ -460,7 +476,9 @@ namespace MediaLib.Web
 			get
 			{
 				if (this.FileExts == null || this.FileExts.Length < 1)
+				{
 					return String.Empty;
+				}
 				return this.FileExts[0];
 			}
 		}
@@ -472,10 +490,16 @@ namespace MediaLib.Web
 		int IComparable.CompareTo(object obj)
 		{
 			MimeType that = obj as MimeType;
-			if (that == null || that.FileExts.Length == 0)
+			if (that == null)
+			{
 				return 1;
-			if (this.FileExts.Length == 0)
-				return -1;
+			}
+
+			if (this.FileExts.Length == 0 &&
+				that.FileExts.Length == 0)
+			{
+				return this.Name.CompareTo(that.Name);
+			}
 
 			return this.FileExts[0].CompareTo(that.FileExts[0]);
 		}
@@ -486,7 +510,7 @@ namespace MediaLib.Web
 	public enum MimeCategory
 	{
 		Unknown,
-		Directory,
+		Folder,
 		Document,
 		Image,
 		Audio,
