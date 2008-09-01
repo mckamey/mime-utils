@@ -35,8 +35,6 @@ using System.Collections.Generic;
 using System.Xml.Serialization;
 using System.Web.Hosting;
 
-using MediaLib.Web.Hosting;
-
 namespace MimeUtils
 {
 	/// <summary>
@@ -68,7 +66,7 @@ namespace MimeUtils
 
 			try
 			{
-				if (FilePathMapper.FileExists(mimeMapXml))
+				if (File.Exists(mimeMapXml))
 				{
 					using (FileStream stream = File.OpenRead(mimeMapXml))
 					{
@@ -142,6 +140,11 @@ namespace MimeUtils
 
 		#region Extension Methods
 
+		/// <summary>
+		/// Gets type information by extension.
+		/// </summary>
+		/// <param name="extension">file extension (e.g. ".xml")</param>
+		/// <returns></returns>
 		public static MimeType GetByExtension(string extension)
 		{
 			if (String.IsNullOrEmpty(extension))
@@ -158,6 +161,11 @@ namespace MimeUtils
 			return MimeTypes.MimeByExtension[extension];
 		}
 
+		/// <summary>
+		/// Gets type information by MIME content-type.
+		/// </summary>
+		/// <param name="contentType">content-type (e.g. "text/plain")</param>
+		/// <returns></returns>
 		public static MimeType GetByContentType(string contentType)
 		{
 			if (String.IsNullOrEmpty(contentType))
@@ -175,9 +183,10 @@ namespace MimeUtils
 		}
 
 		/// <summary>
+		/// Gets content-type by extension.
 		/// </summary>
-		/// <param name="info"></param>
-		/// <returns>MIME Type string</returns>
+		/// <param name="extension">file extension (e.g. ".xml")</param>
+		/// <returns>MIME content-type</returns>
 		/// <remarks>
 		/// http://www.webmaster-toolkit.com/mime-types.shtml
 		/// http://filext.com/detaillist.php?extdetail=xxx
@@ -193,6 +202,11 @@ namespace MimeUtils
 			return mime.ContentType;
 		}
 
+		/// <summary>
+		/// Gets MIME Category by extension.
+		/// </summary>
+		/// <param name="extension">file extension (e.g. ".xml")</param>
+		/// <returns>MIME Category</returns>
 		public static MimeCategory GetCategory(string extension)
 		{
 			if (String.IsNullOrEmpty(extension))
@@ -209,6 +223,11 @@ namespace MimeUtils
 			return mime.Category;
 		}
 
+		/// <summary>
+		/// Gets ImageFormat by extension.
+		/// </summary>
+		/// <param name="extension">file extension (e.g. ".png")</param>
+		/// <returns>ImageFormat</returns>
 		public static System.Drawing.Imaging.ImageFormat GetImageFormat(string extension)
 		{
 			if (String.IsNullOrEmpty(extension))
@@ -443,6 +462,9 @@ namespace MimeUtils
 		#endregion
 	}
 
+	/// <summary>
+	/// Large categories for file types.
+	/// </summary>
 	public enum MimeCategory
 	{
 		Unknown,
