@@ -469,14 +469,15 @@ namespace MimeUtils
 	{
 		Unknown,
 		Folder,
+		Audio,
+		Binary,
+		Code,
+		Compressed,
 		Document,
 		Image,
-		Audio,
+		Text,
 		Video,
-		Xml,
 		Web,
-		Code,
-		Binary,
-		Compressed
+		Xml
 	}
 }
