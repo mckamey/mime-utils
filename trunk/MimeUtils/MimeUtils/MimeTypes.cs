@@ -477,7 +477,6 @@ namespace MimeUtils
 		Image,
 		Text,
 		Video,
-		Web,
 		Xml
 	}
 }
