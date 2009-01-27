@@ -33,7 +33,6 @@ using System.ComponentModel;
 using System.IO;
 using System.Collections.Generic;
 using System.Xml.Serialization;
-using System.Web.Hosting;
 
 namespace MimeUtils
 {
@@ -61,6 +60,10 @@ namespace MimeUtils
 			string mimeMapXml = System.Configuration.ConfigurationManager.AppSettings[MimeTypes.AppSettingsKey_MimeMapXml];
 			if (!String.IsNullOrEmpty(mimeMapXml))
 			{
+				// if not a website, could load as relative from DLL:
+				//string binFolder = System.Reflection.Assembly.GetExecutingAssembly().Location;
+				//binFolder = Path.GetDirectoryName(binFolder);
+				//mimeMapXml = Path.Combine(binFolder, mimeMapXml);
 				mimeMapXml = HostingEnvironment.MapPath(mimeMapXml);
 			}
 
