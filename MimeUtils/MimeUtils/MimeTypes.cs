@@ -64,7 +64,7 @@ namespace MimeUtils
 				//string binFolder = System.Reflection.Assembly.GetExecutingAssembly().Location;
 				//binFolder = Path.GetDirectoryName(binFolder);
 				//mimeMapXml = Path.Combine(binFolder, mimeMapXml);
-				mimeMapXml = HostingEnvironment.MapPath(mimeMapXml);
+				mimeMapXml = System.Web.Hosting.HostingEnvironment.MapPath(mimeMapXml);
 			}
 
 			try
