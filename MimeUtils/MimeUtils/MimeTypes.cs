@@ -60,11 +60,12 @@ namespace MimeUtils
 			string mimeMapXml = System.Configuration.ConfigurationManager.AppSettings[MimeTypes.AppSettingsKey_MimeMapXml];
 			if (!String.IsNullOrEmpty(mimeMapXml))
 			{
+				mimeMapXml = System.Web.Hosting.HostingEnvironment.MapPath(mimeMapXml);
+
 				// if not a website, could load as relative from DLL:
 				//string binFolder = System.Reflection.Assembly.GetExecutingAssembly().Location;
 				//binFolder = Path.GetDirectoryName(binFolder);
 				//mimeMapXml = Path.Combine(binFolder, mimeMapXml);
-				mimeMapXml = System.Web.Hosting.HostingEnvironment.MapPath(mimeMapXml);
 			}
 
 			try
