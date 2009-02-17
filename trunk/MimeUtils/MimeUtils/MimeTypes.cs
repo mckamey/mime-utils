@@ -33,6 +33,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Collections.Generic;
 using System.Xml.Serialization;
+using System.Drawing.Imaging;
 
 namespace MimeUtils
 {
@@ -48,9 +49,6 @@ namespace MimeUtils
 		private static readonly Dictionary<string, MimeType> MimeByContentType;
 		public static readonly MimeType[] ConfigTypes;
 
-		internal const string JavaScriptContentType = "application/javascript";
-		internal const string CssStyleSheetContentType = "text/css";
-
 		#endregion Constants
 
 		#region Init
@@ -62,10 +60,13 @@ namespace MimeUtils
 			{
 				mimeMapXml = System.Web.Hosting.HostingEnvironment.MapPath(mimeMapXml);
 
-				// if not a website, could load as relative from DLL:
-				//string binFolder = System.Reflection.Assembly.GetExecutingAssembly().Location;
-				//binFolder = Path.GetDirectoryName(binFolder);
-				//mimeMapXml = Path.Combine(binFolder, mimeMapXml);
+				if (String.IsNullOrEmpty(mimeMapXml))
+				{
+					// if not a website, could load as relative from DLL:
+					string binFolder = System.Reflection.Assembly.GetExecutingAssembly().Location;
+					binFolder = Path.GetDirectoryName(binFolder);
+					mimeMapXml = Path.Combine(binFolder, mimeMapXml);
+				}
 			}
 
 			try
@@ -232,7 +233,7 @@ namespace MimeUtils
 		/// </summary>
 		/// <param name="extension">file extension (e.g. ".png")</param>
 		/// <returns>ImageFormat</returns>
-		public static System.Drawing.Imaging.ImageFormat GetImageFormat(string extension)
+		public static ImageFormat GetImageFormat(string extension)
 		{
 			if (String.IsNullOrEmpty(extension))
 			{
@@ -254,37 +255,37 @@ namespace MimeUtils
 			{
 				case "bmp":
 				{
-					return System.Drawing.Imaging.ImageFormat.Bmp;
+					return ImageFormat.Bmp;
 				}
 				case "emf":
 				{
-					return System.Drawing.Imaging.ImageFormat.Emf;
+					return ImageFormat.Emf;
 				}
 				case "exif":
 				{
-					return System.Drawing.Imaging.ImageFormat.Exif;
+					return ImageFormat.Exif;
 				}
 				case "gif":
 				{
-					return System.Drawing.Imaging.ImageFormat.Gif;
+					return ImageFormat.Gif;
 				}
 				case "jpg":
 				case "jpeg":
 				{
-					return System.Drawing.Imaging.ImageFormat.Jpeg;
+					return ImageFormat.Jpeg;
 				}
 				case "png":
 				{
-					return System.Drawing.Imaging.ImageFormat.Png;
+					return ImageFormat.Png;
 				}
 				case "tif":
 				case "tiff":
 				{
-					return System.Drawing.Imaging.ImageFormat.Tiff;
+					return ImageFormat.Tiff;
 				}
 				case "wmf":
 				{
-					return System.Drawing.Imaging.ImageFormat.Wmf;
+					return ImageFormat.Wmf;
 				}
 				default:
 				{
