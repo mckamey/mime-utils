@@ -29,11 +29,14 @@
 #endregion License
 
 using System;
-using System.ComponentModel;
 using System.IO;
+using System.ComponentModel;
+using System.Configuration;
 using System.Collections.Generic;
-using System.Xml.Serialization;
 using System.Drawing.Imaging;
+using System.Reflection;
+using System.Web.Hosting;
+using System.Xml.Serialization;
 
 namespace MimeUtils
 {
@@ -45,6 +48,7 @@ namespace MimeUtils
 		#region Constants
 
 		public const string AppSettingsKey_MimeMapXml = "MimeMapXml";
+		private const string MimeTypeFilename = "MimeTypes.xml";
 		private static readonly Dictionary<string, MimeType> MimeByExtension;
 		private static readonly Dictionary<string, MimeType> MimeByContentType;
 		public static readonly MimeType[] ConfigTypes;
@@ -53,60 +57,63 @@ namespace MimeUtils
 
 		#region Init
 
+		/// <summary>
+		/// CCtor
+		/// </summary>
 		static MimeTypes()
 		{
-			string mimeMapXml = System.Configuration.ConfigurationManager.AppSettings[MimeTypes.AppSettingsKey_MimeMapXml];
+			string mimeMapXml = ConfigurationManager.AppSettings[MimeTypes.AppSettingsKey_MimeMapXml];
 			if (!String.IsNullOrEmpty(mimeMapXml))
 			{
-				mimeMapXml = System.Web.Hosting.HostingEnvironment.MapPath(mimeMapXml);
+				mimeMapXml = HostingEnvironment.MapPath(mimeMapXml);
+			}
 
-				if (String.IsNullOrEmpty(mimeMapXml))
-				{
-					// if not a website, could load as relative from DLL:
-					string binFolder = System.Reflection.Assembly.GetExecutingAssembly().Location;
-					binFolder = Path.GetDirectoryName(binFolder);
-					mimeMapXml = Path.Combine(binFolder, mimeMapXml);
-				}
+			if (String.IsNullOrEmpty(mimeMapXml))
+			{
+				// if not a website, could load as relative from DLL:
+				string binFolder = Assembly.GetExecutingAssembly().Location;
+				binFolder = Path.GetDirectoryName(binFolder);
+				mimeMapXml = Path.Combine(binFolder, MimeTypeFilename);
+			}
+
+			if (!File.Exists(mimeMapXml))
+			{
+				throw new ApplicationException("Could not find mime type XML file at '" + mimeMapXml + "'.");
+
+				//// can use this to seed a file
+
+				//// Sort and serialize back to XML
+				//using (FileStream stream = File.OpenWrite(mimeMapXml+"_RoundTrip.xml"))
+				//{
+				//    stream.SetLength(0);
+
+				//    ////Generate sample data
+				//    //MimeTypes.ConfigTypes = new MimeType[2];
+				//    //MimeTypes.ConfigTypes[0] = new MimeType();
+				//    //MimeTypes.ConfigTypes[0].FileExts = new string[1];
+				//    //MimeTypes.ConfigTypes[0].FileExts[0] = ".xml";
+				//    //MimeTypes.ConfigTypes[0].ContentTypes = new string[2];
+				//    //MimeTypes.ConfigTypes[0].ContentTypes[0] = "application/xml";
+				//    //MimeTypes.ConfigTypes[0].ContentTypes[1] = "text/xml";
+				//    //MimeTypes.ConfigTypes[1] = new MimeType();
+				//    //MimeTypes.ConfigTypes[1].FileExts = new string[2];
+				//    //MimeTypes.ConfigTypes[1].FileExts[0] = ".jpg";
+				//    //MimeTypes.ConfigTypes[1].FileExts[1] = ".jpeg";
+				//    //MimeTypes.ConfigTypes[1].ContentTypes = new string[1];
+				//    //MimeTypes.ConfigTypes[1].ContentTypes[0] = "image/jpeg";
+
+				//    Array.Sort(MimeTypes.ConfigTypes);
+				//    System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(MimeType[]));
+				//    serializer.Serialize(stream, MimeTypes.ConfigTypes);
+				//}
 			}
 
 			try
 			{
-				if (File.Exists(mimeMapXml))
+				using (FileStream stream = File.OpenRead(mimeMapXml))
 				{
-					using (FileStream stream = File.OpenRead(mimeMapXml))
-					{
-						System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(MimeType[]));
-						MimeTypes.ConfigTypes = serializer.Deserialize(stream) as MimeType[];
-					}
-
-					////Sort and serialize back to XML
-					//using (FileStream stream = File.OpenWrite(mimeMapXml+"_RoundTrip.xml"))
-					//{
-					//    stream.SetLength(0);
-
-					//    ////Generate sample data
-					//    //MimeTypes.ConfigTypes = new MimeType[2];
-					//    //MimeTypes.ConfigTypes[0] = new MimeType();
-					//    //MimeTypes.ConfigTypes[0].FileExts = new string[1];
-					//    //MimeTypes.ConfigTypes[0].FileExts[0] = ".xml";
-					//    //MimeTypes.ConfigTypes[0].ContentTypes = new string[2];
-					//    //MimeTypes.ConfigTypes[0].ContentTypes[0] = "application/xml";
-					//    //MimeTypes.ConfigTypes[0].ContentTypes[1] = "text/xml";
-					//    //MimeTypes.ConfigTypes[1] = new MimeType();
-					//    //MimeTypes.ConfigTypes[1].FileExts = new string[2];
-					//    //MimeTypes.ConfigTypes[1].FileExts[0] = ".jpg";
-					//    //MimeTypes.ConfigTypes[1].FileExts[1] = ".jpeg";
-					//    //MimeTypes.ConfigTypes[1].ContentTypes = new string[1];
-					//    //MimeTypes.ConfigTypes[1].ContentTypes[0] = "image/jpeg";
-
-					//    Array.Sort(MimeTypes.ConfigTypes);
-					//    System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(MimeType[]));
-					//    serializer.Serialize(stream, MimeTypes.ConfigTypes);
-					//}
-				}
-				else
-				{
-					MimeTypes.ConfigTypes = new MimeType[0];
+					XmlSerializer serializer = new XmlSerializer(typeof(MimeType[]));
+					MimeTypes.ConfigTypes = serializer.Deserialize(stream) as MimeType[];
 				}
 
 				MimeTypes.MimeByExtension = new Dictionary<string, MimeType>(MimeTypes.ConfigTypes.Length);
