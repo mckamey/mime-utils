@@ -34,15 +34,13 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("MimeUtils")]
 [assembly: AssemblyDescription("MIME Utility Library")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("BuildTools")]
-[assembly: AssemblyCopyright("Copyright ©2006-2009 Stephen M. McKamey. All rights reserved.")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
-
-[assembly: ComVisible(false)]
+[assembly: AssemblyProduct("JsonFx.NET")]
+[assembly: AssemblyCopyright("Copyright © 2006-2009 Stephen M. McKamey. All rights reserved.")]
+[assembly: AssemblyCompany("http://jsonfx.net")]
+#if DEBUG
+[assembly: AssemblyConfiguration("Debug")]
+#else
+[assembly: AssemblyConfiguration("Release")]
+#endif
 
 [assembly: Guid("1119DFF2-A24B-49AC-BC22-3D9564FF6C56")]
-
-[assembly: AssemblyFileVersion("1.0.0.0")]
