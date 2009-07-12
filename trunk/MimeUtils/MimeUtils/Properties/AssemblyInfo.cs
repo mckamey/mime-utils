@@ -33,10 +33,10 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("MimeUtils")]
-[assembly: AssemblyDescription("MIME Utility Library")]
-[assembly: AssemblyProduct("JsonFx.NET")]
+[assembly: AssemblyDescription("MIME-Type Utility Library")]
+[assembly: AssemblyProduct("MimeUtils")]
 [assembly: AssemblyCopyright("Copyright © 2006-2009 Stephen M. McKamey. All rights reserved.")]
-[assembly: AssemblyCompany("http://jsonfx.net")]
+[assembly: AssemblyCompany("http://code.google.com/p/mime-utils/")]
 #if DEBUG
 [assembly: AssemblyConfiguration("Debug")]
 #else
