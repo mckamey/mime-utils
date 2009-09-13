@@ -315,6 +315,14 @@
 		<Category>Binary</Category>
 	</MimeType>
 	<MimeType>
+		<Name>Microsoft Visual Studio Project</Name>
+		<FileExt>.csproj</FileExt>
+		<FileExt>.vbproj</FileExt>
+		<FileExt>.sln</FileExt>
+		<ContentType>text/plain</ContentType>
+		<Category>Xml</Category>
+	</MimeType>
+	<MimeType>
 		<Name>Cascading Style Sheet</Name>
 		<FileExt>.css</FileExt>
 		<ContentType>text/css</ContentType>
@@ -796,6 +804,12 @@
 	<MimeType>
 		<FileExt>.map</FileExt>
 		<ContentType>text/plain</ContentType>
+	</MimeType>
+	<MimeType>
+		<Name>ASP.NET MasterPage</Name>
+		<FileExt>.master</FileExt>
+		<ContentType>text/plain</ContentType>
+		<Category>Code</Category>
 	</MimeType>
 	<MimeType>
 		<Name>Microsoft Access</Name>
