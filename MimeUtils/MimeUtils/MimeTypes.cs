@@ -28,6 +28,8 @@
 \*---------------------------------------------------------------------------------*/
 #endregion License
 
+//#define SEED_CONFIG
+
 using System;
 using System.IO;
 using System.ComponentModel;
@@ -51,7 +53,7 @@ namespace MimeUtils
 		private const string MimeTypeFilename = "MimeTypes.xml";
 		private static readonly Dictionary<string, MimeType> MimeByExtension;
 		private static readonly Dictionary<string, MimeType> MimeByContentType;
-		public static readonly MimeType[] ConfigTypes;
+		public static readonly IList<MimeType> ConfigTypes;
 
 		#endregion Constants
 
@@ -78,34 +80,47 @@ namespace MimeUtils
 
 			if (!File.Exists(mimeMapXml))
 			{
+#if SEED_CONFIG
+				// can use this to seed a file
+				// Sort and serialize back to XML
+				using (FileStream stream = File.OpenWrite(mimeMapXml+"_RoundTrip.xml"))
+				{
+					//Generate sample data
+					List<MimeType> configTypes = new List<MimeType>(2);
+					MimeType mimeType = new MimeType();
+					mimeType.FileExts = new string[]
+						{
+							".xml"
+						};
+					mimeType.ContentTypes = new string[]
+						{
+							"application/xml",
+							"text/xml"
+						};
+					configTypes.Add(mimeType);
+
+					mimeType = new MimeType();
+					mimeType.FileExts = new string[]
+						{
+							".jpg",
+							".jpeg"
+						};
+					mimeType.ContentTypes = new string[]
+						{
+							"image/jpeg"
+						};
+					configTypes.Add(mimeType);
+
+					stream.SetLength(0);
+					XmlSerializer serializer = new XmlSerializer(typeof(MimeType[]));
+					serializer.Serialize(stream, MimeTypes.ConfigTypes);
+
+					configTypes.Sort();
+					MimeTypes.ConfigTypes = configTypes.AsReadOnly();
+				}
+#else
 				throw new ApplicationException("Could not find mime type XML file at '" + mimeMapXml + "'.");
-
-				//// can use this to seed a file
-
-				//// Sort and serialize back to XML
-				//using (FileStream stream = File.OpenWrite(mimeMapXml+"_RoundTrip.xml"))
-				//{
-				//    stream.SetLength(0);
-
-				//    ////Generate sample data
-				//    //MimeTypes.ConfigTypes = new MimeType[2];
-				//    //MimeTypes.ConfigTypes[0] = new MimeType();
-				//    //MimeTypes.ConfigTypes[0].FileExts = new string[1];
-				//    //MimeTypes.ConfigTypes[0].FileExts[0] = ".xml";
-				//    //MimeTypes.ConfigTypes[0].ContentTypes = new string[2];
-				//    //MimeTypes.ConfigTypes[0].ContentTypes[0] = "application/xml";
-				//    //MimeTypes.ConfigTypes[0].ContentTypes[1] = "text/xml";
-				//    //MimeTypes.ConfigTypes[1] = new MimeType();
-				//    //MimeTypes.ConfigTypes[1].FileExts = new string[2];
-				//    //MimeTypes.ConfigTypes[1].FileExts[0] = ".jpg";
-				//    //MimeTypes.ConfigTypes[1].FileExts[1] = ".jpeg";
-				//    //MimeTypes.ConfigTypes[1].ContentTypes = new string[1];
-				//    //MimeTypes.ConfigTypes[1].ContentTypes[0] = "image/jpeg";
-
-				//    Array.Sort(MimeTypes.ConfigTypes);
-				//    System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(MimeType[]));
-				//    serializer.Serialize(stream, MimeTypes.ConfigTypes);
-				//}
+#endif
 			}
 
 			try
@@ -113,11 +128,12 @@ namespace MimeUtils
 				using (FileStream stream = File.OpenRead(mimeMapXml))
 				{
 					XmlSerializer serializer = new XmlSerializer(typeof(MimeType[]));
-					MimeTypes.ConfigTypes = serializer.Deserialize(stream) as MimeType[];
+					MimeType[] configTypes = serializer.Deserialize(stream) as MimeType[];
+					MimeTypes.ConfigTypes = new List<MimeType>(configTypes).AsReadOnly();
 				}
 
-				MimeTypes.MimeByExtension = new Dictionary<string, MimeType>(MimeTypes.ConfigTypes.Length);
-				MimeTypes.MimeByContentType = new Dictionary<string, MimeType>(MimeTypes.ConfigTypes.Length);
+				MimeTypes.MimeByExtension = new Dictionary<string, MimeType>(MimeTypes.ConfigTypes.Count);
+				MimeTypes.MimeByContentType = new Dictionary<string, MimeType>(MimeTypes.ConfigTypes.Count);
 
 				foreach (MimeType mime in MimeTypes.ConfigTypes)
 				{
@@ -142,9 +158,9 @@ namespace MimeUtils
 			}
 			catch
 			{
-				MimeTypes.ConfigTypes = new MimeType[0];
-				MimeTypes.MimeByExtension = new Dictionary<string, MimeType>(MimeTypes.ConfigTypes.Length);
-				MimeTypes.MimeByContentType = new Dictionary<string, MimeType>(MimeTypes.ConfigTypes.Length);
+			    MimeTypes.ConfigTypes = new List<MimeType>().AsReadOnly();
+			    MimeTypes.MimeByExtension = new Dictionary<string, MimeType>(MimeTypes.ConfigTypes.Count);
+			    MimeTypes.MimeByContentType = new Dictionary<string, MimeType>(MimeTypes.ConfigTypes.Count);
 			}
 		}
 
@@ -161,13 +177,13 @@ namespace MimeUtils
 		{
 			if (String.IsNullOrEmpty(extension))
 			{
-				return null;
+				return MimeType.Empty;
 			}
 
 			extension = extension.ToLowerInvariant();
 			if (!MimeTypes.MimeByExtension.ContainsKey(extension))
 			{
-				return null;
+				return MimeType.Empty;
 			}
 
 			return MimeTypes.MimeByExtension[extension];
@@ -182,13 +198,13 @@ namespace MimeUtils
 		{
 			if (String.IsNullOrEmpty(contentType))
 			{
-				return null;
+				return MimeType.Empty;
 			}
 
 			contentType = contentType.ToLowerInvariant();
 			if (!MimeTypes.MimeByContentType.ContainsKey(contentType))
 			{
-				return null;
+				return MimeType.Empty;
 			}
 
 			return MimeTypes.MimeByContentType[contentType];
@@ -302,193 +318,5 @@ namespace MimeUtils
 		}
 
 		#endregion Extension Methods
-	}
-
-	/// <summary>
-	/// Multipurpose Internet Mail Extensions (MIME) type
-	/// </summary>
-	[Serializable]
-	public class MimeType : IComparable
-	{
-		#region Fields
-
-		private string name = null;
-		private string description = null;
-		private string[] fileExts = null;
-		private string[] contentTypes = null;
-		private MimeCategory category = MimeCategory.Unknown;
-		private bool primary = false;
-
-		#endregion Fields
-
-		#region Properties
-
-		[DefaultValue("")]
-		[XmlElement("Name")]
-		public string Name
-		{
-			get
-			{
-				if (this.name == null)
-				{
-					return String.Empty;
-				}
-				return this.name;
-			}
-			set { this.name = value; }
-		}
-
-		[DefaultValue("")]
-		[XmlElement("Description")]
-		public string Description
-		{
-			get
-			{
-				if (this.description == null)
-				{
-					return String.Empty;
-				}
-				return this.description;
-			}
-			set { this.description = value; }
-		}
-
-		[DefaultValue(null)]
-		[XmlElement("FileExt")]
-		public string[] FileExts
-		{
-			get { return this.fileExts; }
-			set
-			{
-				if (value == null)
-				{
-					value = new string[0];
-				}
-
-				foreach (string fileExt in value)
-				{
-					if (fileExt == null || fileExt.IndexOf('.') < 0)
-					{
-						throw new FormatException("FileExt is not correct format: "+fileExt);
-					}
-				}
-
-				this.fileExts = value;
-			}
-		}
-
-		[DefaultValue(null)]
-		[XmlElement("ContentType")]
-		public string[] ContentTypes
-		{
-			get { return this.contentTypes; }
-			set
-			{
-				if (value == null)
-				{
-					value = new string[0];
-				}
-
-				foreach (string contentType in value)
-				{
-					if (contentType == null || contentType.IndexOf('/') < 0)
-					{
-						throw new FormatException("ContentType is not correct format: "+contentType);
-					}
-				}
-
-				this.contentTypes = value;
-			}
-		}
-
-		[DefaultValue(MimeCategory.Unknown)]
-		[XmlElement("Category")]
-		public MimeCategory Category
-		{
-			get { return this.category; }
-			set { this.category = value; }
-		}
-
-		[Description("Gets and sets this as the primary type when resolution is ambiguous.")]
-		[DefaultValue(false)]
-		[XmlAttribute("primary")]
-		public bool Primary
-		{
-			get { return this.primary; }
-			set { this.primary = value; }
-		}
-
-		/// <summary>
-		/// Gets the dominant content type for this MIME type.
-		/// </summary>
-		[XmlIgnore]
-		public string ContentType
-		{
-			get
-			{
-				if (this.ContentTypes == null || this.ContentTypes.Length < 1)
-				{
-					return String.Empty;
-				}
-				return this.ContentTypes[0];
-			}
-		}
-
-		/// <summary>
-		/// Gets the dominant file extension for this MIME type.
-		/// </summary>
-		[XmlIgnore]
-		public string FileExt
-		{
-			get
-			{
-				if (this.FileExts == null || this.FileExts.Length < 1)
-				{
-					return String.Empty;
-				}
-				return this.FileExts[0];
-			}
-		}
-
-		#endregion Properties
-
-		#region IComparable Members
-
-		int IComparable.CompareTo(object obj)
-		{
-			MimeType that = obj as MimeType;
-			if (that == null)
-			{
-				return 1;
-			}
-
-			if (this.FileExts.Length == 0 &&
-				that.FileExts.Length == 0)
-			{
-				return this.Name.CompareTo(that.Name);
-			}
-
-			return this.FileExts[0].CompareTo(that.FileExts[0]);
-		}
-
-		#endregion
-	}
-
-	/// <summary>
-	/// Large categories for file types.
-	/// </summary>
-	public enum MimeCategory
-	{
-		Unknown,
-		Folder,
-		Audio,
-		Binary,
-		Code,
-		Compressed,
-		Document,
-		Image,
-		Text,
-		Video,
-		Xml
 	}
 }
