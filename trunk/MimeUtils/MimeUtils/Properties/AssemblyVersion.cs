@@ -2,10 +2,11 @@
 	This is auto-generated code.  All changes will be overwritten.
 \*------------------------------------------------------------------*/
 
-#region 1.0.903.1007
+#region 1.0.909.1722
 
 using System.Reflection;
 
-[assembly: AssemblyVersion("1.0.903.1007")]
+[assembly: AssemblyVersion("1.0.909.1722")]
+[assembly: AssemblyFileVersion("1.0.909.1722")]
 
-#endregion 1.0.903.1007
+#endregion 1.0.909.1722
