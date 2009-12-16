@@ -31,11 +31,11 @@
 //#define SEED_CONFIG
 
 using System;
-using System.IO;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
-using System.Collections.Generic;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Reflection;
 using System.Web.Hosting;
 using System.Xml.Serialization;
@@ -141,16 +141,20 @@ namespace MimeUtils
 					{
 						foreach (string fileExt in mime.FileExts)
 						{
-							string key = fileExt.ToLowerInvariant();
+							string key = '.'+fileExt.ToLowerInvariant().TrimStart('.');
 							if (mime.Primary || !MimeTypes.MimeByExtension.ContainsKey(key))
+							{
 								MimeTypes.MimeByExtension[key] = mime;
+							}
 						}
 
 						foreach (string contentType in mime.ContentTypes)
 						{
 							string key = contentType.ToLowerInvariant();
 							if (mime.Primary || !MimeTypes.MimeByContentType.ContainsKey(key))
+							{
 								MimeTypes.MimeByContentType[key] = mime;
+							}
 						}
 					}
 					catch { }
@@ -180,7 +184,7 @@ namespace MimeUtils
 				return MimeType.Empty;
 			}
 
-			extension = extension.ToLowerInvariant();
+			extension = '.'+extension.ToLowerInvariant().TrimStart('.');
 			if (!MimeTypes.MimeByExtension.ContainsKey(extension))
 			{
 				return MimeType.Empty;
@@ -252,29 +256,18 @@ namespace MimeUtils
 		}
 
 		/// <summary>
-		/// Gets ImageFormat by extension.
+		/// Gets ImageFormat for a MimeType
 		/// </summary>
-		/// <param name="extension">file extension (e.g. ".png")</param>
+		/// <param name="mimeType">MimeType</param>
 		/// <returns>ImageFormat</returns>
-		public static ImageFormat GetImageFormat(string extension)
+		public static ImageFormat GetImageFormat(MimeType mimeType)
 		{
-			if (String.IsNullOrEmpty(extension))
+			if (mimeType == null || String.IsNullOrEmpty(mimeType.FileExt))
 			{
 				return null;
 			}
 
-			// use MimeTypes collection to standardize the extension
-			MimeType mime = MimeTypes.GetByExtension(extension);
-			if (mime != null)
-			{
-				extension = mime.FileExt.ToLowerInvariant();
-			}
-			else
-			{
-				extension = extension.ToLowerInvariant();
-			}
-
-			switch (extension.TrimStart('.'))
+			switch (mimeType.FileExt.TrimStart('.').ToLowerInvariant())
 			{
 				case "bmp":
 				{
@@ -315,6 +308,54 @@ namespace MimeUtils
 					return null;
 				}
 			}
+		}
+
+		/// <summary>
+		/// Gets the image encoder for the given MimeType
+		/// </summary>
+		/// <param name="mimeType"></param>
+		/// <returns>encoder</returns>
+		public static ImageCodecInfo GetImageDecoder(MimeType mimeType)
+		{
+			if (mimeType == null || String.IsNullOrEmpty(mimeType.ContentType))
+			{
+				return null;
+			}
+
+			string contentType = mimeType.ContentType;
+			foreach (ImageCodecInfo codec in ImageCodecInfo.GetImageDecoders())
+			{
+				if (StringComparer.OrdinalIgnoreCase.Equals(codec.MimeType, contentType))
+				{
+					return codec;
+				}
+			}
+
+			return null;
+		}
+
+		/// <summary>
+		/// Gets the image encoder for the given MimeType
+		/// </summary>
+		/// <param name="mimeType"></param>
+		/// <returns>encoder</returns>
+		public static ImageCodecInfo GetImageEncoder(MimeType mimeType)
+		{
+			if (mimeType == null || String.IsNullOrEmpty(mimeType.ContentType))
+			{
+				return null;
+			}
+
+			string contentType = mimeType.ContentType;
+			foreach (ImageCodecInfo codec in ImageCodecInfo.GetImageEncoders())
+			{
+				if (StringComparer.OrdinalIgnoreCase.Equals(codec.MimeType, contentType))
+				{
+					return codec;
+				}
+			}
+
+			return null;
 		}
 
 		#endregion Extension Methods
