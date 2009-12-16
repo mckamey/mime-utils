@@ -35,18 +35,18 @@ namespace MimeUtils
 	/// <summary>
 	/// Large categories for file types.
 	/// </summary>
-	public enum MimeCategory
+	public enum MimeCategory : int
 	{
-		Unknown,
-		Folder,
-		Audio,
-		Binary,
-		Code,
-		Compressed,
-		Document,
-		Image,
-		Text,
-		Video,
-		Xml
+		Unknown = 0,
+		Folder = 1,
+		Audio = 2,
+		Binary = 3,
+		Code = 4,
+		Compressed = 5,
+		Document = 6,
+		Image = 7,
+		Text = 8,
+		Video = 9,
+		Xml = 10
 	}
 }
