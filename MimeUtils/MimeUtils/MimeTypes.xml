@@ -1249,6 +1249,14 @@
 		<ContentType>image/x-cmu-raster</ContentType>
 		<Category>Image</Category>
 	</MimeType>
+	<MimeType primary="true">
+		<Name>Resource Description Framework</Name>
+		<FileExt>.rdf</FileExt>
+		<ContentType>application/rdf+xml</ContentType>
+		<ContentType>application/xml</ContentType>
+		<ContentType>text/xml</ContentType>
+		<Category>Xml</Category>
+	</MimeType>
 	<MimeType>
 		<Name>Resource XML</Name>
 		<FileExt>.resx</FileExt>
@@ -1897,6 +1905,14 @@
 		<ContentType>application/xml</ContentType>
 		<ContentType>text/xml</ContentType>
 		<ContentType>application/x-xml</ContentType>
+		<Category>Xml</Category>
+	</MimeType>
+	<MimeType>
+		<Name>Extensible Metadata Platform</Name>
+		<FileExt>.xmp</FileExt>
+		<ContentType>application/rdf+xml</ContentType>
+		<ContentType>application/xml</ContentType>
+		<ContentType>text/xml</ContentType>
 		<Category>Xml</Category>
 	</MimeType>
 	<MimeType>
